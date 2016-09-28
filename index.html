@@ -131,9 +131,6 @@
 
     function LocumSavingsCtrl($scope, $http, $log) {
 
-      $scope.ethPrice = ethereumStats.priceUsd;
-      $scope.netHashGH = (ethereumStats.difficulty / ethereumStats.blockTime) / 1e9;
-      $scope.blockTime = ethereumStats.blockTime;
       $scope.earnings = {};
 
       $scope.computeProfits = function() {
