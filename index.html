@@ -114,7 +114,7 @@
               <td ng-bind="earnings.monthlyLA | number:2"></td>
             </tr>     
             <tr>
-              <td>Estimated Monthly Net  with locums (without agency) (GBP)</td>
+              <td>Estimated Monthly Net  with locums (without agency)* (GBP)</td>
               <td ng-bind="earnings.monthlyL | number:2"></td>
             </tr>
             <tr>
@@ -134,7 +134,7 @@
       <div class="col-lg-12">
         <h2>Notes</h2>
         <ul>
-          <li>Inster assumptions here.</li>
+          <li>Insert assumptions here.</li>
         </ul>
       </div>
     </div>
@@ -159,7 +159,7 @@
         $scope.agencyPercentage = 0.15
         var userRatio = $scope.monthlySalary * 1/40. * 12/52. * $scope.agencyPercentage;
         var savingsPerMin = userRatio * 1 / 60.;
-        $scope.earnings.month = $scope.monthlySalary;
+        $scope.earnings.month = Number($scope.monthlySalary || 0);
         $scope.earnings.min = savingsPerMin;
         $scope.earnings.hour = $scope.earnings.min * 60;
         $scope.earnings.day = $scope.earnings.hour * 8;
@@ -168,8 +168,8 @@
         $scope.earnings.extraHours = $scope.maxHoursPerWeek - $scope.hoursPerWeek;
         $scope.earnings.locumEarnings = $scope.earnings.month * $scope.earnings.extraHours / $scope.hoursPerWeek;
         $scope.earnings.locumEarningsWAgency = $scope.earnings.locumEarnings * (1.0-$scope.agencyPercentage);
-        $scope.earnings.monthlyLA = $scope.earnings.month--$scope.earnings.locumEarningsWAgency;
-        $scope.earnings.monthlyL = $scope.earnings.month--$scope.earnings.locumEarnings;
+        $scope.earnings.monthlyLA = Number($scope.earnings.month || 0) + Number($scope.earnings.locumEarningsWAgency || 0);
+        $scope.earnings.monthlyL = Number($scope.earnings.month || 0) + Number($scope.earnings.locumEarnings || 0);
         $scope.earnings.extraIncomeYear =  $scope.earnings.locumEarnings * 12.;
       };
 
