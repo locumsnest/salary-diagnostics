@@ -1,11 +1,11 @@
 <html ng-app="ether">
-  <title>Locum Savings Calculator</title>
+  <title>Salary Diagnostics Tool</title>
   
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-  <meta name="title" content="Locum Savings Calculator 1">
-  <meta name="keywords" content="locum savings calculator">
-  <meta name="description" content="Calculating savings in an agency free world">
+  <meta name="title" content="Salary Diagnostics Tool">
+  <meta name="keywords" content="salary diagnostics NHS locum">
+  <meta name="description" content="Salary Diagnostics...">
 
   <link rel="stylesheet" href="http://bootswatch.com/superhero/bootstrap.min.css">
 
@@ -16,10 +16,10 @@
   </style>
 </head>
 
-<body ng-controller="LocumSavingsCtrl" ng-cloak>
+<body ng-controller="SalaryDiagnosticsCtrl" ng-cloak>
   <div class="container">
     <div class="row text-center">
-      <h1>Locum Savings Calculator</h1>
+      <h1>Salary Diagnostics Tool for UK Doctors</h1>
     </div>
   </div>
 
@@ -32,18 +32,35 @@
 
         <form ng-submit="computeProfits()" class="form-horizontal">
           <div class="form-group">
-            <label class="col-lg-5 control-label"> Enter hourly compensation</label>
+            <label class="col-lg-5 control-label">Grade</label>
+            <div class="col-lg-7">
+              <select ng-model="userChoice" ng-change="updateGrade()" class="form-control">
+                <option value="">Choose grade</option>
+                <option value="FY1">Foundation Year 1</option>
+                <option value="FY2">Foundation Year 2</option>
+                <option value="StR1">Specialist Registrar 1</option>
+                <option value="StR2">Specialist Registrar 2</option>
+                <option value="StR3">Specialist Registrar 3</option>
+                <option value="StR4">Specialist Registrar 4</option>
+                <option value="StR5">Specialist Registrar 5</option>
+                <option value="StR6">Specialist Registrar 6</option>
+                <option value="Consultant">Consultant</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-5 control-label">Monthly salary (net)</label>
             <div class="col-lg-7">
               <input 
                 type="text" 
                 class="form-control" 
-                ng-model="hourlyRate" 
-                placeholder="Hourly compensation (GBP)"
+                ng-model="monthlySalary" 
+                placeholder="Month salary (net in GBP)"
                 ng-change="computeProfits()"/>
             </div>
           </div>
           <div class="form-group">
-            <label class="col-lg-5 control-label">Locum Hours Per Week</label>
+            <label class="col-lg-5 control-label">Current hours per week</label>
             <div class="col-lg-7">
               <input 
                 type="text" 
@@ -53,54 +70,59 @@
                 ng-change="computeProfits()"/>
             </div>
           </div>
-          <div class="form-group">
-            <label class="col-lg-5 control-label">Agency percentage</label>
+           <div class="form-group">
+            <label class="col-lg-5 control-label">Max desired hours per week</label>
             <div class="col-lg-7">
               <input 
                 type="text" 
                 class="form-control" 
-                ng-model="agencyPercentage" 
-                placeholder="Agency Percentage"
+                ng-model="maxHoursPerWeek" 
+                placeholder="Hours Per Week"
                 ng-change="computeProfits()"/>
             </div>
           </div>
+          
         </form>
       </div>
       <div class="col-lg-6">
-        <h2>Savings </h2>
+        <h2>Summary </h2>
 
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th class="col-lg-4">Period</th>
-              <th class="col-lg-4 text-left">GBP</th>
-            </tr>
-          </thead>
+        <table class="table table-striped">            
           <tbody>
             <tr>
-              <td>Minute</td>
-              <td ng-bind="earnings.min | number:2"></td>
+              <td>Grade</td>
+              <td ng-bind="grade"></td>
             </tr>
             <tr>
-              <td>Hour</td>
-              <td ng-bind="earnings.hour | number:2"></td>
+              <td>Current hours</td>
+              <td ng-bind="hoursPerWeek | number:2"></td>
             </tr>
             <tr>
-              <td>Day</td>
-              <td ng-bind="earnings.day | number:2"></td>
+              <td>Max desired hours</td>
+              <td ng-bind="maxHoursPerWeek | number:2"></td>
             </tr>
             <tr>
-              <td>Week</td>
-              <td ng-bind="earnings.week | number:2"></td>
+              <td>Extra desired hours</td>
+              <td ng-bind="earnings.extraHours | number:2"></td>
             </tr>
             <tr>
-              <td>Month</td>
-              <td ng-bind="earnings.month | number:2"></td>
+              <td>Current Monthly Net (GBP) </td>
+              <td ng-bind="monthlySalary | number:2"></td>
+            </tr>    
+            <tr>
+              <td>Estimated Monthly Net with locums (agency placed) (GBP)</td>
+              <td ng-bind="earnings.monthlyLA | number:2"></td>
+            </tr>     
+            <tr>
+              <td>Estimated Monthly Net  with locums (without agency) (GBP)</td>
+              <td ng-bind="earnings.monthlyL | number:2"></td>
             </tr>
             <tr>
-              <td>Year</td>
-              <td ng-bind="earnings.year | number:2"></td>
+              <td>Projected yearly income boost (GBP)</td>
+              <td ng-bind="earnings.extraIncomeYear | number:2"></td>
             </tr>
+            
+            
           </tbody>
         </table>
       </div>
@@ -112,7 +134,7 @@
       <div class="col-lg-12">
         <h2>Notes</h2>
         <ul>
-          <li>Assumes a simple percentage fee structure.</li>
+          <li>Inster assumptions here.</li>
         </ul>
       </div>
     </div>
@@ -129,24 +151,31 @@
       $controllerProvider.allowGlobals();
     }]);
 
-    function LocumSavingsCtrl($scope, $http, $log) {
+    function SalaryDiagnosticsCtrl($scope, $http, $log) {
 
       $scope.earnings = {};
 
       $scope.computeProfits = function() {
-        var userRatio = $scope.hourlyRate * $scope.agencyPercentage;
+        $scope.agencyPercentage = 0.15
+        var userRatio = $scope.monthlySalary * 1/40. * 12/52. * $scope.agencyPercentage;
         var savingsPerMin = userRatio * 1 / 60.;
+        $scope.earnings.month = $scope.monthlySalary;
         $scope.earnings.min = savingsPerMin;
         $scope.earnings.hour = $scope.earnings.min * 60;
         $scope.earnings.day = $scope.earnings.hour * 8;
         $scope.earnings.week = $scope.earnings.hour * $scope.hoursPerWeek;
-        $scope.earnings.month = $scope.earnings.week * 52. / 12.;
         $scope.earnings.year = $scope.earnings.week * 52.;
+        $scope.earnings.extraHours = $scope.maxHoursPerWeek - $scope.hoursPerWeek;
+        $scope.earnings.locumEarnings = $scope.earnings.month * $scope.earnings.extraHours / $scope.hoursPerWeek;
+        $scope.earnings.locumEarningsWAgency = $scope.earnings.locumEarnings * (1.0-$scope.agencyPercentage);
+        $scope.earnings.monthlyLA = $scope.earnings.month--$scope.earnings.locumEarningsWAgency;
+        $scope.earnings.monthlyL = $scope.earnings.month--$scope.earnings.locumEarnings;
+        $scope.earnings.extraIncomeYear =  $scope.earnings.locumEarnings * 12.;
       };
 
-      $scope.updateUserHash = function() {
+      $scope.updateGrade = function() {
         var value = $scope.userChoice;
-        $scope.userHash = value;
+        $scope.grade = value;
         $scope.computeProfits();
       };
     }
